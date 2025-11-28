@@ -1,0 +1,84 @@
+body { background: #1a1a1a; color: white; display: flex; justify-content: center; }
+
+.slide { 
+    width: 100%; height: 100%; display: flex; flex-direction: column; 
+    justify-content: center; align-items: center; text-align: center;
+    background: #2E51A2; color: white; padding: 20px; box-sizing: border-box;
+}
+
+.slide span { font-size: 2rem; font-weight: bold; color: #FFD700; }
+.top-anime { background-size: cover; background-position: center; }
+.overlay { background: rgba(0,0,0,0.6); padding: 20px; border-radius: 10px; }
+.share-btn { margin-top: 20px; padding: 10px 20px; background: #fff; border: none; cursor: pointer; }
+
+/* Summary Slide Specifics */
+.summary-slide {
+    background: linear-gradient(135deg, #1e1e1e 0%, #2E51A2 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 40px 30px;
+    color: white;
+    text-align: left; /* Reset alignment */
+}
+
+.summary-header .year-title {
+    font-size: 3rem;
+    margin: 0;
+    line-height: 1;
+    font-weight: 900;
+    color: #FFD700;
+}
+
+.user-handle {
+    font-size: 1.2rem;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.stat-box {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-box.full-width {
+    grid-column: span 2;
+    background: rgba(255, 215, 0, 0.2); /* Gold tint */
+}
+
+.stat-box .label { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
+.stat-box .value { font-size: 2rem; font-weight: bold; }
+.stat-box .value.highlight { color: #FFD700; }
+
+.posters-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    justify-content: center;
+}
+
+.mini-poster img {
+    width: 80px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border: 2px solid white;
+}
+
+.footer {
+    text-align: center;
+    font-size: 0.8rem;
+    opacity: 0.5;
+    margin-top: auto;
+}
