@@ -1,46 +1,332 @@
-body { background: #1a1a1a; color: white; display: flex; justify-content: center; }
-
-.slide { 
-    width: 100%; height: 100%; display: flex; flex-direction: column; 
-    justify-content: center; align-items: center; text-align: center;
-    background: #2E51A2; color: white; padding: 20px; box-sizing: border-box;
+/* --- 1. GLOBAL RESET & LAYOUT --- */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 }
 
-.slide span { font-size: 2rem; font-weight: bold; color: #FFD700; }
-.top-anime { background-size: cover; background-position: center; }
-.overlay { background: rgba(0,0,0,0.6); padding: 20px; border-radius: 10px; }
-.share-btn { margin-top: 20px; padding: 10px 20px; background: #fff; border: none; cursor: pointer; }
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #000000;
+  color: white;
+  min-height: 100vh;
+  /* Prevent scrolling on the main body to keep the "App" feel */
+  overflow-x: hidden;
+}
 
-/* Summary Slide Specifics */
+#root {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.app-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+/* --- 2. LOGIN SCREEN (HOME) --- */
+.login-box {
+  text-align: center;
+  padding: 40px;
+}
+
+.login-box.home-content {
+    position: relative;
+    z-index: 50 !important; /* High z-index to sit on top of gradient */
+    /* Optional: Limit width so it looks good on desktop too */
+    max-width: 600px;
+    width: 90%;
+}
+
+/* Title */
+.login-box h1 {
+    color: #ffffff !important;
+    font-size: 3rem; /* FIXED: 5rem is too big for mobile */
+    font-weight: 900;
+    margin-bottom: 15px;
+    text-shadow: 0 4px 15px rgba(0,0,0,0.8);
+    line-height: 1.1;
+}
+
+/* Paragraph */
+.login-box p {
+    color: #cccccc !important;
+    font-size: 1.2rem;
+    margin-bottom: 30px !important;
+}
+
+/* Button */
+.login-box button {
+    background-color: #FFD700 !important; /* Bright Gold */
+    color: #000000 !important; /* Black Text */
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 15px 40px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+    transition: transform 0.2s ease;
+}
+
+.login-box button:hover {
+    transform: scale(1.05);
+    background-color: #ffe033 !important;
+}
+
+/* --- 3. STORY PLAYER WRAPPER --- */
+.story-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The Glass Container for Stories */
+.stories-container {
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1); 
+  background: rgba(0, 0, 0, 0.2); 
+  backdrop-filter: blur(10px);
+}
+
+/* General Slide Styling */
+.slide { 
+  width: 100%; 
+  height: 100%; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  align-items: center; 
+  text-align: center;
+  background: transparent !important; /* Allow Gradient to show */
+  color: white; 
+  padding: 30px; 
+  box-sizing: border-box;
+}
+
+/* Global Highlight Text (Used in Intro/Message) */
+.slide span { 
+  font-size: 2.5rem; 
+  font-weight: 900; 
+  color: #FFD700; 
+  display: block; 
+  margin: 10px 0;
+}
+
+/* --- 4. INTRO & MESSAGE SLIDES --- */
+.intro-slide, .message-slide {
+    background: transparent !important;
+    align-items: flex-start;
+    text-align: left;
+    padding: 40px;
+}
+
+.intro-slide h1 { 
+    font-size: 2.3rem;   
+    color: #fff; 
+    margin-bottom: 20px;
+    overflow-wrap: break-word; 
+    word-wrap: break-word;     
+    hyphens: auto;             
+    max-width: 100%;           
+    line-height: 1.2;          
+}
+
+.intro-slide h2 { font-size: 1.8rem; color: #888; }
+
+.message-slide h1 { font-size: 2.5rem; line-height: 1.2; }
+.message-slide p { font-size: 1.5rem; margin-top: 20px; font-weight: bold; }
+
+/* --- 5. HERO SLIDE (Top Favorite) --- */
+
+/* FIXED: Missing Container Class */
+.hero-slide-spotify {
+    background: transparent !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.hero-image-container {
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.hero-poster {
+    width: 260px;
+    height: 260px;
+    object-fit: cover;
+    box-shadow: 10px 10px 0px rgba(0,0,0,0.5); 
+    border: 4px solid white; /* FIXED: Changed Black to White for visibility on dark BG */
+    margin-bottom: 20px;
+}
+
+.hero-anime-title {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #ffffff;
+    text-align: center;
+    margin: 0;
+    line-height: 1.1;
+    max-width: 90%;
+    text-transform: uppercase;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.hero-text-block h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-align: center;
+    line-height: 1.4;
+    margin: 0;
+    opacity: 0.9;
+    max-width: 85%;
+    margin: 0 auto;
+}
+
+/* --- 6. LIST SLIDE (Top 5 / Most Watched) --- */
+.list-slide {
+    background: transparent !important;
+    display: flex;
+    flex-direction: column;
+    padding: 30px 20px;
+    height: 100%;
+    box-sizing: border-box;
+    overflow: hidden; 
+    text-align: left;
+}
+
+.list-slide .list-header {
+    font-size: 1.8rem;
+    color: white;
+    margin-bottom: 15px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.ranking-list {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    gap: 5px;
+    padding-bottom: 10px;
+}
+
+.ranking-item {
+    display: grid;
+    grid-template-columns: 30px 55px 1fr; 
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+/* Override Global Styles for Lists */
+.list-slide .rank-num {
+    font-size: 2rem !important;
+    font-weight: 900;
+    color: white !important;
+    text-align: center;
+    line-height: 1;
+    margin: 0;
+    width: auto;
+}
+
+.rank-img {
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.rank-text-col {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+    overflow: hidden;
+    min-width: 0;
+}
+
+.list-slide .rank-title {
+    font-size: 1rem !important;
+    font-weight: 700;
+    color: white !important;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    display: block;
+}
+
+.list-slide .rank-subtitle {
+    font-size: 0.85rem !important;
+    color: #b3b3b3 !important;
+    font-weight: 500;
+    text-transform: none;
+    margin: 0;
+    display: block;
+}
+
+/* --- 7. CHART SLIDE --- */
+.chart-slide {
+    background: transparent !important;
+}
+.chart-container {
+    width: 100%;
+    height: 300px;
+    margin-top: 30px;
+}
+
+/* --- 8. SUMMARY SLIDE --- */
+/* IMPORTANT: Keep background opacity for this slide so Download works properly */
 .summary-slide {
     background: linear-gradient(135deg, #1e1e1e 0%, #2E51A2 100%);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 40px 30px;
+    padding: 40px 25px;
     color: white;
-    text-align: left; /* Reset alignment */
+    text-align: left;
 }
 
 .summary-header .year-title {
-    font-size: 3rem;
+    font-size: 2.8rem;
     margin: 0;
-    line-height: 1;
+    line-height: 0.9;
     font-weight: 900;
     color: #FFD700;
 }
 
-.user-handle {
-    font-size: 1.2rem;
-    opacity: 0.8;
-    margin-top: 5px;
-}
+.user-handle { font-size: 1.1rem; opacity: 0.8; margin-top: 5px; }
 
 .stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
-    margin: 30px 0;
+    gap: 12px;
+    margin: 10px 0;
 }
 
 .stat-box {
@@ -49,36 +335,90 @@ body { background: #1a1a1a; color: white; display: flex; justify-content: center
     border-radius: 12px;
     display: flex;
     flex-direction: column;
+    justify-content: center;
 }
 
 .stat-box.full-width {
     grid-column: span 2;
-    background: rgba(255, 215, 0, 0.2); /* Gold tint */
+    background: rgba(255, 215, 0, 0.15);
+    border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
-.stat-box .label { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
-.stat-box .value { font-size: 2rem; font-weight: bold; }
+.stat-box .label { font-size: 0.75rem; text-transform: uppercase; opacity: 0.8; }
+.stat-box .value { font-size: 1.8rem; font-weight: 800; }
 .stat-box .value.highlight { color: #FFD700; }
 
-.posters-row {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-    justify-content: center;
-}
-
+.posters-row { display: flex; gap: 8px; justify-content: flex-start; }
 .mini-poster img {
-    width: 80px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 6px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    border: 2px solid white;
+    width: 70px; height: 100px; object-fit: cover;
+    border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);
 }
 
-.footer {
-    text-align: center;
-    font-size: 0.8rem;
-    opacity: 0.5;
-    margin-top: auto;
+.footer { text-align: center; font-size: 0.7rem; opacity: 0.4; margin-top: 20px; text-transform: uppercase; }
+
+/* --- 9. OVERLAY & CONTROLS --- */
+.start-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999; cursor: pointer;
 }
+
+.play-button { text-align: center; color: white; animation: pulse 2s infinite ease-in-out; }
+.play-button h1 { font-size: 4rem; margin: 0; }
+.play-button p { font-size: 1rem; margin-top: 15px; font-weight: 600; }
+
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.controls {
+    margin-top: 20px;
+    display: flex; gap: 15px; align-items: center; z-index: 100;
+}
+
+.share-btn { 
+    padding: 10px 20px; background: #FFD700; color: black; font-weight: bold;
+    border: none; border-radius: 30px; cursor: pointer; 
+}
+
+.icon-btn {
+    background: rgba(255,255,255,0.1); color: white;
+    border: 1px solid rgba(255,255,255,0.2); padding: 10px;
+    border-radius: 50%; cursor: pointer; font-size: 1.2rem;
+    width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;
+}
+
+/* --- LOGOUT BUTTON --- */
+.logout-btn {
+    position: fixed;
+    top: 20px;       /* Moved down slightly for better visibility */
+    right: 20px;     /* Moved left slightly */
+    
+    /* FIX: Increase Z-Index to be higher than Overlay (9999) */
+    z-index: 10001 !important; 
+    
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    
+    /* Improved Styling for Visibility */
+    background: rgba(0, 0, 0, 0.6); /* Darker background */
+    backdrop-filter: blur(5px);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.logout-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: white;
+}
+

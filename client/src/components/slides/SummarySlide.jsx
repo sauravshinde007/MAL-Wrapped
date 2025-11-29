@@ -1,6 +1,9 @@
 import React from 'react';
 
 const SummarySlide = ({ stats }) => {
+  // SAFETY CHECK: Ensure the list exists before trying to slice it
+  const topList = stats.topRated || []; 
+
   return (
     <div className="slide summary-slide" id="summary-card">
       <div className="summary-header">
@@ -26,7 +29,8 @@ const SummarySlide = ({ stats }) => {
       <div className="top-list-preview">
         <p>Top Favorites</p>
         <div className="posters-row">
-            {stats.top5.slice(0, 3).map((anime, i) => (
+            {/* FIXED: changed stats.top5 to topList */}
+            {topList.slice(0, 3).map((anime, i) => (
                 <div key={i} className="mini-poster">
                     <img src={anime.image} alt="poster" crossOrigin="anonymous" />
                 </div>
@@ -35,7 +39,7 @@ const SummarySlide = ({ stats }) => {
       </div>
 
       <div className="footer">
-        <p>MAL Wrapped by SauravSan</p>
+        <p>MAL Wrapped Project</p>
       </div>
     </div>
   );

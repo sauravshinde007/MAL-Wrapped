@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "axios": "^1.13.2",
+    "chart.js": "^4.5.1",
     "framer-motion": "^12.23.24",
     "html2canvas": "^1.4.1",
     "react": "^19.2.0",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.0",
     "react-insta-stories": "^2.8.0"
   },

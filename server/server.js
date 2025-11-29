@@ -61,7 +61,8 @@ app.get('/auth/callback', async (req, res) => {
     }
 });
 
-// 3. The "Wrapped" Logic Endpoint
+// Inside server.js
+
 app.get('/api/wrapped', async (req, res) => {
     const { token, year } = req.query;
     if (!token) return res.status(401).json({ error: "No token provided" });
@@ -69,23 +70,16 @@ app.get('/api/wrapped', async (req, res) => {
     const targetYear = year || new Date().getFullYear().toString();
 
     try {
-        // A. Fetch Basic User Profile first (to get a unique ID/Username)
-        // We need this to check the DB before fetching the huge anime list
         const userRes = await axios.get('https://api.myanimelist.net/v2/users/@me', {
             headers: { Authorization: `Bearer ${token}` }
         });
         const username = userRes.data.name;
 
-        // B. CHECK DB: Do we have cached stats?
+        // Check Cache (Keep your existing Mongo Logic here)
         const cached = await UserStats.findOne({ username, year: targetYear });
-        if (cached) {
-            console.log("Serving from Cache");
-            return res.json(cached.data);
-        }
+        if (cached) return res.json(cached.data);
 
-        console.log("Fetching fresh data from MAL...");
-
-        // C. If not in DB, Fetch Full List & Calculate (Your existing logic)
+        // Fetch Data
         const listRes = await axios.get('https://api.myanimelist.net/v2/users/@me/animelist', {
             headers: { Authorization: `Bearer ${token}` },
             params: {
@@ -102,24 +96,50 @@ app.get('/api/wrapped', async (req, res) => {
 
         if (yearlyAnime.length === 0) return res.json({ empty: true });
 
-        // Calculation Logic
+        // --- CALCULATIONS ---
+
         let totalMinutes = 0;
         const genreCounts = {};
-        yearlyAnime.forEach(({ node }) => {
+        const genreEvolution = Array(12).fill(0).map(() => ({})); // 12 Months of genres
+
+        yearlyAnime.forEach(({ node, list_status }) => {
             const duration = node.average_episode_duration || (24 * 60);
-            totalMinutes += (duration / 60) * node.num_episodes;
+            const totalDuration = (duration / 60) * node.num_episodes; // in minutes
+            totalMinutes += totalDuration;
+
+            // Extract Month (0-11)
+            const month = new Date(list_status.finish_date).getMonth();
+
             node.genres.forEach(g => {
+                // Total Counts
                 genreCounts[g.name] = (genreCounts[g.name] || 0) + 1;
+                
+                // Monthly Evolution
+                genreEvolution[month][g.name] = (genreEvolution[month][g.name] || 0) + 1;
             });
+
+            // Attach calculated duration to object for sorting later
+            node.calculated_duration = totalDuration;
         });
 
-        const top5 = yearlyAnime
+        // 1. Top Rated (Score)
+        const topRated = [...yearlyAnime]
             .sort((a, b) => b.list_status.score - a.list_status.score)
             .slice(0, 5)
             .map(item => ({
                 title: item.node.title,
                 image: item.node.main_picture.large,
                 score: item.list_status.score
+            }));
+
+        // 2. Most Watched (Duration/Time Spent)
+        const mostWatched = [...yearlyAnime]
+            .sort((a, b) => b.node.calculated_duration - a.node.calculated_duration)
+            .slice(0, 5)
+            .map(item => ({
+                title: item.node.title,
+                image: item.node.main_picture.large,
+                minutes: Math.round(item.node.calculated_duration)
             }));
 
         const topGenre = Object.entries(genreCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Unknown';
@@ -129,11 +149,13 @@ app.get('/api/wrapped', async (req, res) => {
             totalAnime: yearlyAnime.length,
             totalHours: Math.round(totalMinutes / 60),
             topGenre,
-            top5,
+            topRated,     // Top 5 by Score
+            mostWatched,  // Top 5 by Time Wasted
+            genreEvolution, // Array of 12 months data
             year: targetYear
         };
 
-        // D. SAVE TO DB (Cache it)
+        // Save to DB (Keep your existing Mongo Logic)
         await UserStats.create({ username, year: targetYear, data: finalStats });
 
         res.json(finalStats);
