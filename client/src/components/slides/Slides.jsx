@@ -77,3 +77,34 @@ export const HeroSlide = ({ anime }) => {
         </div>
     );
 };
+
+// --- NEW COMPONENT: Genre Reveal ---
+export const GenreRevealSlide = ({ genre }) => (
+    <div className="slide genre-reveal-slide">
+        <motion.h2 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            style={{ fontSize: '1.8rem', color: '#ccc', marginBottom: '1rem', fontWeight: 600 }}
+        >
+            Your Personality Type...
+        </motion.h2>
+        
+        <motion.h1 
+            initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
+            animate={{ scale: 1, opacity: 1, rotate: 0 }}
+            transition={{ delay: 0.5, duration: 0.8, type: "spring", stiffness: 120 }}
+            style={{ 
+                fontSize: '3rem', 
+                fontWeight: 900, 
+                color: '#FFD700',
+                textTransform: 'uppercase',
+                wordBreak: 'break-word',
+                lineHeight: 0.9,
+                textShadow: '0 10px 30px rgba(255, 215, 0, 0.3)'
+            }}
+        >
+            {genre}
+        </motion.h1>
+    </div>
+);

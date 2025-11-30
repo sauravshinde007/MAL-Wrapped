@@ -4,7 +4,8 @@ import axios from 'axios';
 import html2canvas from 'html2canvas';
 
 // --- Import Custom Slide Components ---
-import { IntroSlide, MessageSlide, HeroSlide } from './slides/Slides';
+// ADDED: GenreRevealSlide to the import list
+import { IntroSlide, MessageSlide, HeroSlide, GenreRevealSlide } from './slides/Slides';
 import ListSlide from './slides/ListSlide';
 import EvolutionChart from './slides/EvolutionChart';
 import SummarySlide from './slides/SummarySlide';
@@ -13,41 +14,55 @@ import SummarySlide from './slides/SummarySlide';
 import AnimatedGradientBackground from './ui/AnimatedGradientBackground';
 import { getThemeSong } from '../utils/musicMap';
 
-const StoryView = ({ token, year }) => {
+const StoryView = ({ token, year, onLogout }) => {
     // --- STATE MANAGEMENT ---
     const [stories, setStories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [statsData, setStatsData] = useState(null);
-    const [readyToPlay, setReadyToPlay] = useState(false); // Controls the "Tap to Start" overlay
+    const [readyToPlay, setReadyToPlay] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
+    
+    // --- RESPONSIVE DIMENSIONS STATE ---
+    const [windowSize, setWindowSize] = useState({
+        width: window.innerWidth > 768 ? 400 : window.innerWidth,
+        height: window.innerHeight > 800 ? 700 : window.innerHeight
+    });
 
-    // Audio Reference
     const audioRef = useRef(new Audio());
+
+    // --- HANDLE WINDOW RESIZE ---
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowSize({
+                width: window.innerWidth > 768 ? 400 : window.innerWidth,
+                height: window.innerHeight > 800 ? 700 : window.innerHeight
+            });
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // --- MUSIC LOGIC ---
     const fadeOutMusic = () => {
         const audio = audioRef.current;
         if (!audio) return;
-
         console.log("Story finished. Fading out music...");
         const fadeAudio = setInterval(() => {
-            // Check if volume is high enough to decrease
             if (audio.volume > 0.05) {
                 audio.volume -= 0.05;
             } else {
-                // Cleanup
                 audio.volume = 0;
                 audio.pause();
                 clearInterval(fadeAudio);
             }
-        }, 100); // Reduce volume every 100ms
+        }, 100);
     };
 
     // --- MAIN DATA FETCH & SETUP ---
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // 1. Fetch Data from Backend
+                // 1. Fetch Data
                 const { data } = await axios.get(`http://localhost:5000/api/wrapped?token=${token}&year=${year}`);
                 setStatsData(data);
 
@@ -56,16 +71,25 @@ const StoryView = ({ token, year }) => {
                     return; 
                 }
 
-                // 2. Setup Audio based on Top Genre
+                // 2. Setup Audio
                 const songUrl = getThemeSong(data.topGenre);
                 audioRef.current.src = songUrl;
                 audioRef.current.loop = true;
-                audioRef.current.volume = 0.5; // Start at 50%
+                audioRef.current.volume = 0.5;
 
-                // 3. Construct the 11-Page Story
+                // 3. Construct the Story Array (Now 13 Slides)
                 const storyData = [
                     // Slide 1: Intro
                     { content: () => <IntroSlide username={data.username} />, duration: 6000 },
+
+                    // --- NEW SLIDE 1.5: Genre Teaser ---
+                    { content: () => <MessageSlide 
+                        mainText="There was one vibe that defined your year..." 
+                        subText="Any guesses?" 
+                    />, duration: 5000 },
+
+                    // --- NEW SLIDE 1.6: Genre Reveal ---
+                    { content: () => <GenreRevealSlide genre={data.topGenre} />, duration: 6000 },
 
                     // Slide 2: Time Wasted Message
                     { content: () => <MessageSlide 
@@ -124,7 +148,6 @@ const StoryView = ({ token, year }) => {
 
         fetchData();
 
-        // Cleanup: Stop music immediately if user leaves page
         return () => {
             if(audioRef.current) {
                 audioRef.current.pause();
@@ -134,10 +157,8 @@ const StoryView = ({ token, year }) => {
     }, [token, year]);
 
     // --- HANDLERS ---
-
     const handleStart = () => {
         setReadyToPlay(true);
-        // Browser requires interaction to play audio
         audioRef.current.play().catch(e => console.log("Audio play failed:", e));
     };
 
@@ -147,18 +168,20 @@ const StoryView = ({ token, year }) => {
     };
 
     const downloadSummary = async () => {
-        // Target the specific summary card ID, fallback to container if missing
-        const element = document.getElementById('summary-card') || document.querySelector('.stories-container');
+        // CHANGE THIS LINE: Target the specific inner card ID
+        const element = document.getElementById('summary-card-to-download');
         
         if (!element) {
-            alert("Wait for the Summary Slide to appear!");
+            console.error("Summary card element not found for download.");
+            // You might want to show a user-friendly notification here
             return;
         }
 
         try {
             const canvas = await html2canvas(element, { 
-                useCORS: true, // Crucial for external images (MAL posters)
-                scale: 2       // High resolution for sharing
+                useCORS: true, // Crucial for external images
+                scale: 2,      // High resolution
+                backgroundColor: null // Important: lets the element's own background shine through
             });
             const link = document.createElement('a');
             link.download = `MAL-Wrapped-${statsData?.year || year}.png`;
@@ -176,12 +199,11 @@ const StoryView = ({ token, year }) => {
         <div className="story-wrapper" style={{ position: 'relative', zIndex: 1 }}>
             
             {/* 1. BACKGROUND GRADIENT */}
-            {/* FIXED: Changed zIndex from -1 to 0 to sit ON TOP of body background */}
             <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
                 <AnimatedGradientBackground 
                     animationSpeed={0.05} 
                     breathingRange={10}
-                    gradientColors={["#2979FF", "#000000"]} // Blue to Black
+                    gradientColors={["#2979FF", "#000000"]} 
                 />
             </div>
 
@@ -198,30 +220,20 @@ const StoryView = ({ token, year }) => {
             {/* 3. MAIN CONTENT */}
             {readyToPlay && (
                 <>
-                    {/* FIXED: Added zIndex: 2 to ensure stories sit ABOVE the gradient */}
                     <div className="stories-container" style={{ position: 'relative', zIndex: 2 }}>
                         <Stories
                             stories={stories}
                             defaultInterval={5000}
-                            width={400}
-                            height={700}
+                            width={windowSize.width}
+                            height={windowSize.height}
                             loop={false}
                             onAllStoriesEnd={fadeOutMusic}
-                            // FIXED: Explicitly pass object styles for transparency
-                            storyStyles={{ 
-                                width: '100%', 
-                                height: '100%', 
-                                background: 'transparent',
-                                backgroundColor: 'transparent' 
-                            }}
-                            storyContainerStyles={{ 
-                                background: 'transparent',
-                                backgroundColor: 'transparent'
-                            }}
+                            storyStyles={{ width: '100%', height: '100%', background: 'transparent', backgroundColor: 'transparent' }}
+                            storyContainerStyles={{ background: 'transparent', backgroundColor: 'transparent' }}
                         />
                     </div>
-                    
-                    {/* 4. CONTROLS */}
+
+                    {/* CONTROLS (Mute & Download) */}
                     <div className="controls" style={{ position: 'relative', zIndex: 100 }}>
                         <button className="icon-btn" onClick={toggleMute}>
                             {isMuted ? "🔇" : "🔊"}
@@ -229,9 +241,16 @@ const StoryView = ({ token, year }) => {
 
                         {statsData && (
                             <button className="share-btn" onClick={downloadSummary}>
-                                Share
+                                Download Card
                             </button>
                         )}
+                    </div>
+                    
+                    {/* NEW: LOGOUT BUTTON BELOW CONTROLS */}
+                    <div className="footer-actions" style={{ position: 'relative', zIndex: 100, marginTop: '15px' }}>
+                        <button className="text-logout-btn" onClick={onLogout}>
+                            Logout / Reset
+                        </button>
                     </div>
                 </>
             )}
