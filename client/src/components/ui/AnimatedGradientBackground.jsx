@@ -1,23 +1,23 @@
-import { motion } from "framer-motion";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 
 const AnimatedGradientBackground = ({
-  // Updated defaults for a better linear look (Blue bottom fading to black top)
-  startingGap = 0, 
+  startingGap = 0,
   Breathing = true,
   gradientColors = [
-    "#2979FF", // Blue (at bottom)
-    "#0A0A0A", // Black (at top)
+    '#2979FF', // Blue (at bottom)
+    '#0A0A0A', // Black (at top)
   ],
-  gradientStops = [0, 80], // Blue starts at 0%, transitions to black at 80%
+  gradientStops = [0, 80],
   animationSpeed = 0.05,
-  breathingRange = 15, // How much the gradient shifts up and down
+  breathingRange = 15,
   containerStyle = {},
-  topOffset = 0, // Unused in linear mode but kept for prop compatibility
 }) => {
-  // Validation
+  // Guard: colors and stops must match
   if (gradientColors.length !== gradientStops.length) {
-    console.error("GradientColors and GradientStops must have the same length.");
+    console.error(
+      'GradientColors and GradientStops must have the same length.'
+    );
     return null;
   }
 
@@ -25,12 +25,11 @@ const AnimatedGradientBackground = ({
 
   useEffect(() => {
     let animationFrame;
-    // 'offset' replaces 'width'. It oscillates to create the movement.
     let offset = startingGap;
     let direction = 1;
 
     const animateGradient = () => {
-      // Breathing logic: oscillates the offset value
+      // Breathing logic
       if (offset >= startingGap + breathingRange) direction = -1;
       if (offset <= startingGap - breathingRange) direction = 1;
 
@@ -39,14 +38,12 @@ const AnimatedGradientBackground = ({
 
       const gradientStopsString = gradientStops
         .map((stop, index) => {
-            // We add the oscillating offset to the stops to make them move.
-            // We don't move the first stop (0%) to keep the very bottom anchored.
-            const currentStop = index === 0 ? stop : stop + offset;
-            return `${gradientColors[index]} ${currentStop}%`
+          // Oscillate the stops
+          const currentStop = index === 0 ? stop : stop + offset;
+          return `${gradientColors[index]} ${currentStop}%`;
         })
-        .join(", ");
+        .join(', ');
 
-      // --- CHANGE HERE: radial-gradient became linear-gradient(to top, ...) ---
       const gradient = `linear-gradient(to top, ${gradientStopsString})`;
 
       if (containerRef.current) {
@@ -59,7 +56,14 @@ const AnimatedGradientBackground = ({
     animationFrame = requestAnimationFrame(animateGradient);
 
     return () => cancelAnimationFrame(animationFrame);
-  }, [startingGap, Breathing, gradientColors, gradientStops, animationSpeed, breathingRange]);
+  }, [
+    startingGap,
+    Breathing,
+    gradientColors,
+    gradientStops,
+    animationSpeed,
+    breathingRange,
+  ]);
 
   return (
     <motion.div
@@ -67,14 +71,15 @@ const AnimatedGradientBackground = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1, transition: { duration: 2 } }}
       style={{
-        position: 'absolute',
+        position: 'fixed', // Locks to viewport
         top: 0,
         left: 0,
-        width: '100%',
-        height: '100%',
+        width: '100vw',
+        height: '100dvh',
+        zIndex: 0, // Behind app content
+        pointerEvents: 'none',
         overflow: 'hidden',
-        zIndex: 0, 
-        ...containerStyle
+        ...containerStyle,
       }}
     >
       <div

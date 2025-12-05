@@ -12,11 +12,12 @@ const SummarySlide = ({ stats }) => {
       <div className="summary-card-bg" id="summary-card-to-download">
         
         <div className="summary-header">
-          <h2 className="year-title">{stats.year} WRAPPED</h2>
+          <h2 className="year-title">ANIME WRAPPED</h2>
           <p className="user-handle">@{stats.username}</p>
         </div>
 
         <div className="stats-grid">
+          {/* Row 1 */}
           <div className="stat-box">
             <span className="label">Anime</span>
             <span className="value">{stats.totalAnime}</span>
@@ -25,9 +26,19 @@ const SummarySlide = ({ stats }) => {
             <span className="label">Hours</span>
             <span className="value">{stats.totalHours}</span>
           </div>
-          <div className="stat-box full-width">
+
+          {/* Row 2: Now split into Genre and Author */}
+          <div className="stat-box">
             <span className="label">Top Genre</span>
-            <span className="value highlight">{stats.topGenre}</span>
+            <span className="value highlight" style={{fontSize: '1.4rem'}}>
+                {stats.topGenre}
+            </span>
+          </div>
+          <div className="stat-box">
+            <span className="label">Fav Author</span>
+            <span className="value highlight" style={{fontSize: '1.4rem'}}>
+                {stats.favoriteAuthor}
+            </span>
           </div>
         </div>
 
@@ -43,8 +54,8 @@ const SummarySlide = ({ stats }) => {
         </div>
 
         <div className="footer">
-          <p>MAL Wrapped Project</p>
-        </div>
+          <p style={{fontSize: '0.8em'}}>Authorized by MyAnimeList</p>
+      </div>
 
       </div>
     </div>

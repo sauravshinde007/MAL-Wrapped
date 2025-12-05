@@ -3,6 +3,8 @@ import StoryView from './components/StoryView';
 import AnimatedGradientBackground from './components/ui/AnimatedGradientBackground';
 import './App.css';
 
+const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
+
 function App() {
   const [token, setToken] = useState(null);
   const currentYear = new Date().getFullYear();
@@ -13,16 +15,16 @@ function App() {
     const urlToken = params.get('token');
 
     if (urlToken) {
-        setToken(urlToken);
-        localStorage.setItem('mal_token', urlToken); 
-        window.history.replaceState({}, document.title, "/"); 
+      setToken(urlToken);
+      localStorage.setItem('mal_token', urlToken);
+      window.history.replaceState({}, document.title, '/');
     } else if (storedToken) {
-        setToken(storedToken);
+      setToken(storedToken);
     }
   }, []);
 
   const handleLogin = () => {
-    window.location.href = 'http://localhost:5000/auth/login';
+    window.location.href = `${SERVER_URL}/auth/login`;
   };
 
   const handleLogout = () => {
@@ -31,24 +33,27 @@ function App() {
   };
 
   return (
-    <div className="app-container">
-      {!token ? (
-        <div className="home-screen">
-            <AnimatedGradientBackground 
-                animationSpeed={0.03} 
-                breathingRange={10}
-            />
-            <div className="login-box home-content">
-                <h1>MAL Wrapped {currentYear}</h1>
-                <p style={{marginBottom: '20px', opacity: 0.8}}>Discover your anime year in review.</p>
-                <button onClick={handleLogin}>Connect MyAnimeList</button>
-            </div>
-        </div>
-      ) : (
-        /* --- CHANGED HERE: Passed onLogout prop, removed button --- */
-        <StoryView token={token} year={currentYear} onLogout={handleLogout} />
-      )}
-    </div>
+    <>
+      {/* LAYER 1: The Fixed Background (Always visible) */}
+      <AnimatedGradientBackground
+        animationSpeed={0.05}
+        breathingRange={10}
+        gradientColors={['#2979FF', '#000000']}
+      />
+
+      {/* LAYER 2: The Scrollable Content */}
+      <div className="app-container">
+        {!token ? (
+          <div className="login-box home-content">
+            <h1>MAL Wrapped {currentYear}</h1>
+            <p>Discover your anime year in review.</p>
+            <button onClick={handleLogin}>Connect MyAnimeList</button>
+          </div>
+        ) : (
+          <StoryView token={token} year={currentYear} onLogout={handleLogout} />
+        )}
+      </div>
+    </>
   );
 }
 

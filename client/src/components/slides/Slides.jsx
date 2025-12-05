@@ -1,33 +1,34 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-// 1. Intro Slide - Slower Fade In
+// ... (Keep IntroSlide and MessageSlide as they were) ...
+// 1. Intro Slide
 export const IntroSlide = ({ username }) => (
     <div className="slide intro-slide">
         <motion.h1 
             initial={{ opacity: 0, y: 30 }} 
             animate={{ opacity: 1, y: 0 }} 
-            transition={{ duration: 2, ease: "easeOut" }} // Was 1s
+            transition={{ duration: 2, ease: "easeOut" }} 
         >
             Hi {username}
         </motion.h1>
         <motion.h2 
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
-            transition={{ delay: 2.5, duration: 2 }} // Was delay 2s
+            transition={{ delay: 2.5, duration: 2 }} 
         >
             Your Anime Wrapped is ready.<br/>Are you?
         </motion.h2>
     </div>
 );
 
-// 2. Message Slide - Slower Slide In
+// 2. Message Slide
 export const MessageSlide = ({ mainText, subText, accentColor = "#FFD700" }) => (
     <div className="slide message-slide">
         <motion.h1 
             initial={{ x: -50, opacity: 0 }} 
             animate={{ x: 0, opacity: 1 }}
-            transition={{ duration: 1.5, ease: "easeOut" }} // Added explicit slow duration
+            transition={{ duration: 1.5, ease: "easeOut" }} 
         >
             {mainText}
         </motion.h1>
@@ -36,7 +37,7 @@ export const MessageSlide = ({ mainText, subText, accentColor = "#FFD700" }) => 
                 style={{ color: accentColor }}
                 initial={{ opacity: 0 }} 
                 animate={{ opacity: 1 }} 
-                transition={{ delay: 1, duration: 1.5 }} // Slower delay and fade
+                transition={{ delay: 1, duration: 1.5 }} 
             >
                 {subText}
             </motion.p>
@@ -44,14 +45,12 @@ export const MessageSlide = ({ mainText, subText, accentColor = "#FFD700" }) => 
     </div>
 );
 
-// 3. Hero Slide - Slower Reveal
+// ... (Keep HeroSlide and GenreRevealSlide as they were) ...
+// 3. Hero Slide
 export const HeroSlide = ({ anime }) => {
     const formattedValue = (anime.score || 0).toLocaleString();
-
     return (
         <div className="slide">
-            
-            {/* Image & Title Container */}
             <motion.div 
                 className="hero-image-container"
                 initial={{ scale: 0.8, opacity: 0 }} 
@@ -59,12 +58,9 @@ export const HeroSlide = ({ anime }) => {
                 transition={{ duration: 0.8, ease: "backOut" }}
             >
                 <img src={anime.image} alt={anime.title} className="hero-poster" />
-                
-                {/* NEW: Anime Title */}
                 <h2 className="hero-anime-title">{anime.title}</h2>
             </motion.div>
 
-            {/* Bottom Text */}
             <motion.div className="hero-text-block"
                 initial={{ y: 40, opacity: 0 }} 
                 animate={{ y: 0, opacity: 1 }}
@@ -78,7 +74,7 @@ export const HeroSlide = ({ anime }) => {
     );
 };
 
-// --- NEW COMPONENT: Genre Reveal ---
+// 4. Genre Reveal
 export const GenreRevealSlide = ({ genre }) => (
     <div className="slide genre-reveal-slide">
         <motion.h2 
@@ -106,5 +102,37 @@ export const GenreRevealSlide = ({ genre }) => (
         >
             {genre}
         </motion.h1>
+    </div>
+);
+
+// --- NEW: Author Hero Slide (Replaces the text-only reveal) ---
+export const AuthorHeroSlide = ({ authorName, authorImage }) => (
+    <div className="slide">
+        {/* Reusing 'hero-image-container' class for consistency */}
+        <motion.div 
+            className="hero-image-container"
+            initial={{ scale: 0.8, opacity: 0 }} 
+            animate={{ scale: 1, opacity: 1 }} 
+            transition={{ duration: 0.8, ease: "backOut" }}
+        >
+            <img 
+                src={authorImage || 'https://cdn.myanimelist.net/images/questionmark_23.gif'} 
+                alt={authorName} 
+                className="hero-poster" /* Reusing the exact same shadow/border style */
+            />
+            
+            <h2 className="hero-anime-title">{authorName}</h2>
+        </motion.div>
+
+        <motion.div 
+            className="hero-text-block"
+            initial={{ y: 40, opacity: 0 }} 
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8, ease: "easeOut" }}
+        >
+            <h1>
+                The top author behind your favorite shows
+            </h1>
+        </motion.div>
     </div>
 );
