@@ -1,9 +1,13 @@
 /* --- 1. GLOBAL RESET & LAYOUT --- */
-
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
+}
+
+/* Prevent scrolling inside the Story Player specifically to stop gesture conflicts */
+* {
+  touch-action: pan-y;
 }
 
 html,
@@ -11,17 +15,20 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
+  /* Allow the body to grow beyond viewport if content is tall */
+  min-height: 100dvh; 
   background-color: #000000;
   color: white;
   overflow-x: hidden;
+  overflow-y: auto; /* Enable vertical scrolling */
 }
 
 #root {
   width: 100%;
   min-height: 100dvh;
-  display: grid;
-  place-items: center;
+  display: flex; /* Flexbox allows better vertical stacking than Grid */
+  flex-direction: column;
+  align-items: center;
 }
 
 /* LAYER 2: The Content Container */
@@ -30,10 +37,12 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* Top alignment prevents the top of the card from being cut off on small screens */
+  justify-content: flex-start; 
   align-items: center;
   position: relative;
   z-index: 10;
+  padding: 40px 0; /* Add vertical breathing room */
 }
 
 /* --- 2. LOGIN SCREEN (HOME) --- */
@@ -45,6 +54,9 @@ body {
   text-align: center;
   padding: 40px;
   border-radius: 20px;
+  /* Center the login box vertically in the viewport */
+  margin-top: auto; 
+  margin-bottom: 20px;
 }
 
 .login-box h1 {
@@ -85,22 +97,23 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center; /* Center vertically */
-  min-height: 100vh;      /* Use full viewport height */
-  padding: 10px 0;        /* Small padding top/bottom */
-  box-sizing: border-box;
+  justify-content: flex-start;
+  width: 100%;
+  /* Remove fixed height to allow container to flow naturally */
+  padding-bottom: 20px; 
 }
 
 /* The Glass Container for Stories */
 .stories-container {
-  border-radius: 15px; /* Important for the card look */
+  border-radius: 15px;
   overflow: hidden;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.15);
   background: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
-  /* Ensure transform doesn't break fixed children */
   transform: translateZ(0);
+  /* Disable browser gestures inside the player */
+  touch-action: none; 
 }
 
 /* General Slide Styling */
@@ -163,15 +176,6 @@ body {
 }
 
 /* --- 5. HERO SLIDE --- */
-.hero-slide-spotify {
-  background: transparent !important;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
-
 .hero-image-container {
   margin-bottom: 30px;
   display: flex;
@@ -328,60 +332,50 @@ body {
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Keeps elements spread out */
-  padding: 40px 30px; /* Increased horizontal padding slightly */
+  justify-content: space-between;
+  padding: 40px 30px;
   color: white;
   text-align: left;
   box-sizing: border-box;
 }
 
 .summary-header {
-  /* Give the header some natural space */
   margin-bottom: 20px;
 }
 
 .summary-header .year-title {
   font-size: 2.8rem;
   margin: 0;
-  line-height: 1.1; /* CHANGED: Was 0.9. 1.1 prevents text overlapping */
+  line-height: 1.1;
   font-weight: 900;
   color: #ffd700;
-  letter-spacing: -1px; /* Tightens the letters slightly for a cleaner look */
+  letter-spacing: -1px;
 }
 
 .user-handle {
-  font-size: 1.2rem; /* Slightly larger */
+  font-size: 1.2rem;
   opacity: 0.8;
-  margin-top: 8px; /* More space between title and handle */
+  margin-top: 8px;
   font-weight: 500;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px; /* Increased gap */
-  margin: 20px 0; /* More vertical breathing room */
-  flex-grow: 1; /* Allows this section to expand and fill empty space */
+  gap: 15px;
+  margin: 20px 0;
+  flex-grow: 1;
   align-content: center;
 }
 
 .stat-box {
   background: rgba(255, 255, 255, 0.1);
-  padding: 20px 15px; /* More internal padding for a "bigger" look */
-  border-radius: 16px; /* Softer corners */
+  padding: 20px 15px;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Subtle depth */
-  
-}
-
-.stat-box.full-width {
-  grid-column: span 2;
-  background: rgba(255, 215, 0, 0.15);
-  border: 1px solid rgba(255, 215, 0, 0.3);
-  align-items: center; /* Center the genre text */
-  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
 .stat-box .label {
@@ -398,43 +392,40 @@ body {
   line-height: 1;
 }
 
-/* UPDATE THIS BLOCK */
 .stat-box .value.highlight {
   color: #ffd700;
-  font-size: 1.3rem; /* Smaller font for text vs numbers */
+  font-size: 1.3rem;
   line-height: 1.2;
-  word-break: break-word; /* Ensure long names wrap */
+  word-break: break-word;
   display: -webkit-box;
-  -webkit-line-clamp: 2; /* Limit to 2 lines max */
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* FAVORITES SECTION */
 .top-list-preview {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center everything */
+  align-items: center;
   margin-bottom: 10px;
 }
 
 .top-list-preview p {
-  align-self: flex-start; /* Keep "Top Favorites" label on the left */
+  align-self: flex-start;
   margin: 0 0 10px 0;
   font-size: 1rem;
   opacity: 0.9;
 }
 
-
 .posters-row {
   display: flex;
-  gap: 12px; /* More space between posters */
-  justify-content: center; /* CHANGED: Centers the images */
+  gap: 12px;
+  justify-content: center;
   width: 100%;
 }
 
 .mini-poster img {
-  width: 80px; /* Slightly larger images */
+  width: 80px;
   height: 120px;
   object-fit: cover;
   border-radius: 8px;
@@ -472,29 +463,13 @@ body {
   color: white;
   animation: pulse 2s infinite ease-in-out;
 }
-.play-button h1 {
-  font-size: 4rem;
-  margin: 0;
-}
-.play-button p {
-  font-size: 1rem;
-  margin-top: 15px;
-  font-weight: 600;
-}
+.play-button h1 { font-size: 4rem; margin: 0; }
+.play-button p { font-size: 1rem; margin-top: 15px; font-weight: 600; }
 
 @keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 1;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .controls {
@@ -506,13 +481,15 @@ body {
 }
 
 .share-btn {
-  padding: 10px 20px;
+  padding: 12px 30px;
   background: #ffd700;
   color: black;
   font-weight: bold;
   border: none;
   border-radius: 30px;
   cursor: pointer;
+  font-size: 1rem;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
 }
 
 .icon-btn {
@@ -543,7 +520,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 1px;
   font-weight: 600;
-  margin-top: 20px;
+  margin-top: 15px;
   position: relative;
   z-index: 100;
 }
@@ -554,6 +531,122 @@ body {
   border-color: white;
 }
 
+/* --- 11. FOOTER COMPONENT STYLES --- */
+.app-footer {
+width: 100%;
+  padding: 10px 0 30px 0; /* Adjusted padding */
+  position: relative;
+  z-index: 30;
+  margin-top: 0; 
+  display: flex;
+  justify-content: center;
+  
+  /* --- CENTERING FIX START --- */
+  /* This pushes back against the Login Box's top margin to center the group */
+  margin-bottom: auto; 
+  /* --- CENTERING FIX END --- */
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers the GitHub Button horizontally */
+  gap: 15px;
+  text-align: center;
+  width: 100%;
+}
+
+.github-btn {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.github-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  color: #ffd700;
+  border-color: #ffd700;
+}
+
+.footer-links {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-btn:hover { color: white; }
+
+/* --- MODAL STYLES --- */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.modal-content {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 30px;
+  border-radius: 16px;
+  
+  /* FIX STARTS HERE */
+  width: 80%;          /* Take up 90% of screen width */
+  max-width: 500px;    /* But never more than 500px */
+  box-sizing: border-box; /* Include padding in width calculation! */
+  margin: 0 auto;      /* Center it horizontally */
+  /* FIX ENDS HERE */
+
+  color: #eee;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-content h2 { margin-top: 0; color: #ffd700; }
+.modal-content h3 { margin-bottom: 10px; margin-top: 20px; color: white; }
+.modal-content p { font-size: 0.95rem; line-height: 1.6; color: #ccc; }
+.modal-content a { color: #41D1FF; }
+
+.close-btn {
+  position: absolute;
+  top: 15px; right: 15px;
+  background: transparent; border: none;
+  font-size: 1.5rem; color: #888;
+  cursor: pointer; padding: 5px;
+}
+.close-btn:hover { color: white; }
+
+/* Desktop Logout Position */
 @media screen and (min-width: 769px) {
   .text-logout-btn {
     position: fixed;
@@ -566,7 +659,6 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     z-index: 99999 !important;
   }
-
   .text-logout-btn:hover {
     background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
@@ -578,15 +670,24 @@ body {
 /* ========================================= */
 
 @media screen and (max-width: 768px) {
-  /* --- EXISTING GENERAL MOBILE STYLES --- */
   .login-box h1 { font-size: 2.5rem !important; }
   .login-box p { font-size: 1rem !important; }
   .login-box.home-content { width: 95%; padding: 30px 20px; }
   .hero-poster { width: 200px; height: 200px; }
   .hero-anime-title { font-size: 1.2rem; }
   .hero-text-block h1 { font-size: 1.1rem; }
-  .story-wrapper { justify-content: center; padding: 10px 0; }
-  .text-logout-btn { margin-top: 15px; padding: 8px 20px; font-size: 0.8rem; }
+  
+  .story-wrapper { 
+    justify-content: center; 
+    padding: 10px 0; 
+  }
+  
+  .text-logout-btn { 
+    margin-top: 15px; 
+    padding: 8px 20px; 
+    font-size: 0.8rem; 
+  }
+  
   .intro-slide h1, .message-slide h1 { font-size: 1.8rem !important; }
   .intro-slide h2 { font-size: 1.6rem; }
   .message-slide p { font-size: 1.3rem; }
@@ -596,76 +697,54 @@ body {
   .rank-title { font-size: 0.9rem !important; }
   .list-slide .rank-subtitle { font-size: 0.8rem !important; }
 
-  /* --- SUMMARY CARD COMPACT MODE --- */
+  /* --- COMPACT SUMMARY CARD (Fixed Posters) --- */
   
-  /* 1. Reduce overall padding to maximize internal space */
   .summary-card-bg {
     padding: 20px 15px !important;
-    justify-content: flex-start; /* FIX: Stack items from top instead of spacing them out */
-    gap: 15px; /* Control spacing manually between major sections */
+    justify-content: flex-start; 
+    gap: 15px; 
     overflow: hidden;
   }
 
-  /* 2. Compact Header */
-  .summary-header {
-    margin-bottom: 0; /* Remove extra margin */
-    flex-shrink: 0;
-  }
-  .summary-header .year-title {
-    font-size: 2rem; /* Slightly smaller to save vertical space */
-    line-height: 1;
-  }
-  .user-handle {
-    margin-top: 4px; /* Tighter spacing */
-    font-size: 1rem;
-  }
+  .summary-header { margin-bottom: 0; flex-shrink: 0; }
+  .summary-header .year-title { font-size: 2rem; line-height: 1; }
+  .user-handle { margin-top: 4px; font-size: 1rem; }
 
-  /* 3. Shift Stats Grid Up & Make Compact */
   .stats-grid {
-    margin: 5px 0 15px 0; /* Reduce vertical margins significantly */
-    gap: 8px; /* Tighter gap between boxes */
-    flex-grow: 0; /* FIX: Stop it from pushing other content down */
+    margin: 5px 0 15px 0;
+    gap: 8px;
+    flex-grow: 0;
     align-content: flex-start;
   }
 
-  .stat-box {
-    padding: 10px; /* Smaller boxes */
-  }
-  .stat-box .label {
-    font-size: 0.7rem;
-    margin-bottom: 2px;
-  }
-  .stat-box .value {
-    font-size: 1.4rem;
-  }
+  .stat-box { padding: 10px; }
+  .stat-box .label { font-size: 0.7rem; margin-bottom: 2px; }
+  .stat-box .value { font-size: 1.4rem; }
+  .stat-box .value.highlight { font-size: 1.1rem; -webkit-line-clamp: 2; }
 
-  /* 4. Optimize Favorites Section to Fill Remaining Space */
   .top-list-preview {
-    flex-grow: 1; /* Allow this section to take whatever space is left */
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     margin-bottom: 0;
-    min-height: 0; /* Crucial for flex containers to shrink contents */
+    min-height: 0;
   }
 
-  .top-list-preview p {
-    font-size: 0.9rem;
-    margin-bottom: 8px;
-    margin-top: 0;
-  }
+  .top-list-preview p { font-size: 0.9rem; margin-bottom: 8px; margin-top: 0; }
 
-  /* 5. Fluid Grid for Posters */
+  /* FLUID GRID LAYOUT FOR POSTERS */
   .posters-row {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* This ensures 3 columns that will SHRINK to fit */
+    grid-template-columns: repeat(3, minmax(0, 1fr)); 
     gap: 8px;
     width: 100%;
-    /* Ensure the grid doesn't overflow vertically */
     height: auto; 
   }
 
   .mini-poster {
+    min-width: 0; /* Allows flex/grid child to shrink below content size */
     width: 100%;
     aspect-ratio: 2/3;
     position: relative;
@@ -682,14 +761,67 @@ body {
     display: block;
   }
 
-  /* Footer compacting */
-  .footer {
-    margin-top: 5px;
-    font-size: 0.6rem;
-  }
-
-  /* Controls/Logout */
+  .footer { margin-top: 5px; font-size: 0.6rem; }
   .controls { margin-top: 10px; }
   .footer-actions { margin-top: 10px; }
   .start-overlay .play-button h1 { font-size: 3rem; }
+
+  /* --- INFO MODAL MOBILE FIXES --- */
+/* ... inside @media screen and (max-width: 768px) ... */
+
+  /* --- INFO MODAL MOBILE FIXES (STRICT) --- */
+  .modal-backdrop {
+    padding: 0; /* Remove padding from container to let flex center properly */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    /* 1. Force width to be 85% of the VIEWPORT, not the parent */
+    width: 85vw !important; 
+    max-width: 85vw !important;
+    
+    /* 2. Handle internal spacing */
+    padding: 25px 20px !important;
+    box-sizing: border-box;
+    
+    /* 3. CRITICAL: Force long URLs/Text to break so they don't stretch the box */
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+
+    /* 4. Layout */
+    margin: 0 auto;
+    max-height: 80vh;
+    border-radius: 12px;
+  }
+
+  /* 5. Ensure links specifically behave */
+  .modal-content a {
+    display: inline-block;
+    max-width: 100%;
+    word-break: break-all; /* Forces links to break anywhere if needed */
+  }
+
+  /* Adjust typography for mobile */
+  .modal-content h2 { font-size: 1.4rem; }
+  .modal-content h3 { font-size: 1.1rem; }
+  .modal-content p { font-size: 0.9rem; }
+  
+  .close-btn {
+    top: 10px;
+    right: 10px;
+    padding: 8px; /* Larger touch target */
+    font-size: 1.8rem; /* Easier to see/tap */
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1); /* Add background so it's visible over content */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import StoryView from './components/StoryView';
 import AnimatedGradientBackground from './components/ui/AnimatedGradientBackground';
+import Footer from './components/ui/Footer';
 import './App.css';
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
@@ -34,22 +35,25 @@ function App() {
 
   return (
     <>
-      {/* LAYER 1: The Fixed Background (Always visible) */}
       <AnimatedGradientBackground
         animationSpeed={0.05}
         breathingRange={10}
         gradientColors={['#2979FF', '#000000']}
       />
 
-      {/* LAYER 2: The Scrollable Content */}
       <div className="app-container">
         {!token ? (
-          <div className="login-box home-content">
-            <h1>MAL Wrapped {currentYear}</h1>
-            <p>Discover your anime year in review.</p>
-            <button onClick={handleLogin}>Connect MyAnimeList</button>
-          </div>
+          <>
+            {/* LOGIN VIEW: Keep Footer here */}
+            <div className="login-box home-content">
+              <h1>Anime Wrapped {currentYear}</h1>
+              <p>Discover your Spotify like anime review.</p>
+              <button onClick={handleLogin}>Connect MyAnimeList</button>
+            </div>
+            <Footer />
+          </>
         ) : (
+          /* AUTH VIEW: Footer removed from here, moved into StoryView */
           <StoryView token={token} year={currentYear} onLogout={handleLogout} />
         )}
       </div>
