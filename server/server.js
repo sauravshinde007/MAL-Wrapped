@@ -154,7 +154,7 @@ app.get('/api/wrapped', async (req, res) => {
         for (const show of showsToAnalyze) {
             try {
                 // Jikan Rate Limit (~3 req/sec), using 600ms delay for safety
-                await delay(600); 
+                await delay(400); 
                 
                 const staffRes = await axios.get(
                     `https://api.jikan.moe/v4/anime/${show.node.id}/staff`
@@ -221,4 +221,4 @@ app.get('/api/wrapped', async (req, res) => {
     }
 });
 
-app.listen(5000, () => console.log('Backend running on port 5000'));
+module.exports = app;
