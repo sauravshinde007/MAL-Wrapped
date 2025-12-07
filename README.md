@@ -1,6 +1,3 @@
-
-````markdown
-
 ![Project Banner](assets/banner.png)
 
 # 🎬 Anime Year in Review (Unofficial MAL Wrapped)
@@ -92,8 +89,6 @@ This application is **Authorized by MyAnimeList** but is an unofficial project a
 
   * Data provided by MyAnimeList and Jikan.
   * User data is **never** stored on our servers.
-
------
 
 **Made with ❤️ for the Anime Community**
 
