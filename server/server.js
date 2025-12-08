@@ -169,7 +169,14 @@ app.get('/api/wrapped', async (req, res) => {
 
                 creators.forEach(c => {
                     const name = c.person.name;
-                    const image = c.person.images?.jpg?.image_url || null;
+                    // const image = c.person.images?.jpg?.image_url || null;
+                    const image  = null;
+
+                    // FALLBACK IMAGE: If Jikan has no image for the person, use the Anime Poster
+                    if (!image || image.includes('questionmark')) {
+                        // Use the large picture of the anime we are currently analyzing
+                        image = show.node.main_picture ? (show.node.main_picture.large || show.node.main_picture.medium) : null;
+                    }
 
                     // WEIGHTED FORMULA
                     const score = show.list_status.score || 5; 
