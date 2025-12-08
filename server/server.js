@@ -143,18 +143,21 @@ app.get('/api/wrapped', async (req, res) => {
 
         const topGenre = Object.entries(genreCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'Unknown';
 
-        // --- E. AUTHOR CALCULATION (Using Jikan API) ---
+        // ... (inside /api/wrapped, after topGenre calculation) ...
+
+        // --- E. AUTHOR CALCULATION (Robust Jikan Logic) ---
         console.log("Calculating Top Authors...");
         const authorCounts = {};
         
+        // OPTIMIZATION: Reduce to Top 6 to prevent Vercel Timeouts & Jikan Rate Limits
+        // 6 requests * 600ms = ~3.6 seconds (Safe for 10s serverless limit)
         const showsToAnalyze = [...yearlyAnime]
             .sort((a, b) => b.node.calculated_duration - a.node.calculated_duration)
-            .slice(0, 10); 
+            .slice(0, 6); 
 
         for (const show of showsToAnalyze) {
             try {
-                // Jikan Rate Limit (~3 req/sec), using 600ms delay for safety
-                await delay(400); 
+                await delay(650); // Increased delay slightly for safety
                 
                 const staffRes = await axios.get(
                     `https://api.jikan.moe/v4/anime/${show.node.id}/staff`
@@ -162,19 +165,28 @@ app.get('/api/wrapped', async (req, res) => {
                 
                 const staff = staffRes.data.data || []; 
                 
-                const creators = staff.filter(person => 
+                // 1. Try to find the Mangaka / Creator
+                let creators = staff.filter(person => 
                     person.positions.includes("Original Creator") || 
                     person.positions.includes("Story & Art")
                 );
 
+                // 2. FALLBACK: If it's an Anime Original (no Mangaka), look for the Director
+                if (creators.length === 0) {
+                    creators = staff.filter(person => 
+                        person.positions.includes("Director") ||
+                        person.positions.includes("Series Composition")
+                    );
+                }
+
                 creators.forEach(c => {
                     const name = c.person.name;
-                    // const image = c.person.images?.jpg?.image_url || null;
-                    const image  = null;
-
-                    // FALLBACK IMAGE: If Jikan has no image for the person, use the Anime Poster
+                    
+                    // IMAGE LOGIC: Jikan Image -> Fallback to Anime Poster
+                    let image = c.person.images?.jpg?.image_url;
+                    
+                    // If image is missing or is the generic "question mark" placeholder
                     if (!image || image.includes('questionmark')) {
-                        // Use the large picture of the anime we are currently analyzing
                         image = show.node.main_picture ? (show.node.main_picture.large || show.node.main_picture.medium) : null;
                     }
 
@@ -186,7 +198,13 @@ app.get('/api/wrapped', async (req, res) => {
                     if (!authorCounts[name]) {
                         authorCounts[name] = { weight: 0, count: 0, image: image };
                     }
-                    if (!authorCounts[name].image && image) {
+                    
+                    // Keep the best image found (Real photo > Anime Poster)
+                    if (authorCounts[name].image && authorCounts[name].image.includes('questionmark') && !image.includes('questionmark')) {
+                         authorCounts[name].image = image;
+                    } 
+                    // If we have no image yet, take this one
+                    else if (!authorCounts[name].image) {
                         authorCounts[name].image = image;
                     }
 
@@ -195,7 +213,9 @@ app.get('/api/wrapped', async (req, res) => {
                 });
 
             } catch (e) {
-                console.log(`Failed to fetch staff for ${show.node.title} (Jikan Error)`);
+                // Log the specific error code to help debugging (check Vercel logs)
+                const status = e.response ? e.response.status : "Unknown";
+                console.log(`Failed staff fetch for ${show.node.title} | Status: ${status}`);
             }
         }
 
@@ -228,4 +248,5 @@ app.get('/api/wrapped', async (req, res) => {
     }
 });
 
+// app.listen(5000, () => console.log('Backend running on port 5000'));
 module.exports = app;
