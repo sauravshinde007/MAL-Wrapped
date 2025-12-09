@@ -74,7 +74,8 @@ app.get('/api/wrapped', async (req, res) => {
             params: {
                 fields: 'list_status{start_date,finish_date,updated_at,score},num_episodes,average_episode_duration,genres,main_picture',
                 limit: 1000,
-                status: 'completed'
+                status: 'completed',
+                sort: 'list_updated_at'
             }
         });
         const data = listRes.data.data;
